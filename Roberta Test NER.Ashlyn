@@ -1,0 +1,432 @@
+# %%
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+import json
+from docx import Document
+import os
+import numpy as np
+from sklearn.feature_extraction.text import CountVectorizer
+import matplotlib.pyplot as plt
+from wordcloud import WordCloud
+import pdfplumber
+import nltk
+nltk.download('punkt')
+from textblob import TextBlob
+import plotly.graph_objects as go
+import plotly.express as px
+import os
+import json
+from docx import Document
+import pdfplumber
+from bs4 import BeautifulSoup
+import spacy
+import matplotlib.pyplot as plt
+from wordcloud import WordCloud
+spacy.cli.download("en_core_web_sm")
+import pandas as pd
+from collections import Counter
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
+import numpy as np
+import plotly.graph_objects as go
+import plotly.express as px
+from collections import Counter
+from plotly.offline import plot
+from sklearn.metrics import precision_score, recall_score, f1_score
+from sklearn.model_selection import train_test_split
+
+
+# %%
+#pip install numpy scikit-learn matplotlib wordcloud
+
+# %%
+#!pip install scikit-learn
+
+# %%
+#!pip install transformers torch
+
+# %%
+import torch
+from transformers import RobertaTokenizer, RobertaForSequenceClassification, pipeline
+
+# %% [markdown]
+# ***
+
+# %% [markdown]
+# ## Loading the Model and Tokenizer
+
+# %%
+tokenizer = RobertaTokenizer.from_pretrained('roberta-base')
+model = RobertaForSequenceClassification.from_pretrained('roberta-base', num_labels = 2)
+
+# %%
+resume_text = """
+
+Nicholas E. Reese
+Van Ness, Washington D.C.
+412-216-2398
+Nicholas.E.Reese15@gmail.com 
+Education 
+•Georgetown University - August 2023 – December 2024
+Master of Science Business Analytics – MSBA candidate
+Peer-Elected Class Representative 
+•Dickinson College - August 2014 – September 2018
+Economics & Political Science Double Major
+Varsity Tennis Captain 
+•University of Bologna - August 2016
+
+Skills
+- R studio
+- Python
+- Power BI
+- SQL
+- Neural Networks
+- Machine Learning
+- Macro Modeling
+- AWS Cloud Services
+- Pandas
+- A/B Testing
+- Scikit-Learn
+- Econometrics
+
+Professional Experience
+FINRA, Washington, D.C.	June 2020 – Present 
+Senior Analyst, Market Regulation	September 2022 – Present 
+•Earned top 10% of performance of analysts for past two years.
+•Led team in research implementing PostgreSQL and NoSQL queries for large data pulls.
+•Spearheaded new analytical approaches to financial workflow with tools such as R & Python for model development.
+•Developed working predictive modeling schemas for senior staff using statistical analysis.
+•Leveraged skills in platforms like Python, R, Power BI, Tableau and SQL accompanied with strong statistical background in financial markets.
+•Built the Security-Based Swap training manual deck & produced the recorded info session for all of FINRA. 
+•Selected for the FINRA’s first Georgetown Advanced Analytics Program as one of the most junior staff awarded opportunity.
+•Incorporated statistical analytics to assist in creating a NPL tool to analyze financial documents language to minimize time on manual analysis.
+•Produced unsupervised and supervised models to perform analysis for Security-Based Swaps trade patterns.
+•Improved FINRA platforms with Data Scientists for higher accuracy and efficiency. 
+•Managed process of re-engineering supervisory reviews through advanced analytic tools for senior staff.
+•Implements advanced analytics to assist senior staff with maximizing efficiencies in daily workloads and trade pattern creations.
+•Presented visualization case work using Power BI & Tableau to senior leadership.
+•Persuaded senior staff to allow for statistical analytics tools like R.
+•Mentored over 20 junior & senior staff members on improving processes with analytical tools for financial reviews.
+•Managed junior staff with day-to-day workload while teaching the staff how to use advanced analytics.
+Analyst, Market Regulation	June 2021-September 2022
+·Created macroeconomic models for newly implemented FINRA Rule 2232 and MSRB Rule G-15.
+·Mentored junior staff with creating macro models, synthesizing responses from FINRA member firms.
+·Won the Regulator Scholarship for continued financial learning based on individual performance.
+·Received six internal awards for expertise in Municipal and Corporate Bond analysis as an analyst.
+Associate Analyst, Market Regulation	June 2020 – June 2021
+·Created macroeconomic models to quantify business models of selected firms for FINRA Rule 2232.
+             BNY Mellon, Pittsburgh, PA						                 September 2019 – June 2020
+Corporate Trust Associate
+·Leader & instructor of the Bloomberg software for the Corporate Trust Team.
+LendingHome, Internship, Pittsburgh, PA
+Funding Specialist & Post Closing Member	March 2019 – August 2019
+·Reviewed closing documents to ensure precise execution for funding staff.
+              Veraction/Trax, Junior Business Analyst, Memphis, TN	  June 2016 - August 2016                                                    June 2016 - August 2016
+·Led the creation, development, and implementation of Request For Proposal (RFP) database.
+"""
+
+
+# %%
+resume_text
+
+# %% [markdown]
+# ***
+
+# %%
+from transformers import pipeline
+
+# %%
+ner_pipeline = pipeline('ner', model = "dbmdz/bert-large-cased-finetuned-conll03-english",
+                       aggregation_strategy = 'simple')
+
+# %%
+entities = ner_pipeline(resume_text)
+
+# %%
+for entity in entities:
+    print(f"Entity: {entity['word']}, Label: {entity['entity_group']}, Score: {entity['score']:.4f}")
+
+# %%
+filtered_entities = [entity for entity in entities if entity['entity_group'] != 'MISC']
+
+# %%
+for entity in filtered_entities:
+    print(f"Entity: {entity['word']}, Label: {entity['entity_group']}, Score: {entity['score']:.4f}")
+
+# %%
+import re
+
+# Regex pattern for email extraction
+email_pattern = r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}'
+
+# Find all email addresses in the text
+emails = re.findall(email_pattern, resume_text)
+
+redacted_text = re.sub(email_pattern, '[REDACTED]', resume_text)
+
+# Display found email addresses
+print("Extracted Emails:", emails)
+
+#Display redacted email addresses
+print("\nRedacted Text:\n", redacted_text)
+
+# %% [markdown]
+# 
+
+# %%
+# Load the NER pipeline
+ner_pipeline2 = pipeline("ner", model="dbmdz/bert-large-cased-finetuned-conll03-english", aggregation_strategy="simple")
+
+
+# Detect entities using the NER pipeline
+entities2 = ner_pipeline2(resume_text)
+
+# Regex pattern for email extraction
+#def redact_pii(text):
+email_pattern = r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}'
+phone_pattern = r'\+?\d[\d\s-]{9,}\d'
+year_pattern = r'\b(19|20)\d{2}\b'
+
+
+redacted_text = re.sub(email_pattern, '[EMAIL REDACTED]', resume_text)
+redacted_text = re.sub(phone_pattern, '[PHONE REDACTED]', redacted_text)
+redacted_text = re.sub(year_pattern, '[YEAR REDACTED]', redacted_text)
+
+entities2 = ner_pipeline2(redacted_text)
+
+entities2 = sorted(entities2, key=lambda x: x['start'])
+
+offset = 0 
+for entity in sorted(entities2, key=lambda x: x['start']):
+    if entity['score'] > 0.80:
+        start, end = entity['start'] + offset, entity['end'] + offset
+        redaction = '[PERSON]' if entity['entity_group'] == 'PER' else '[ORG]'
+        redacted_text = redacted_text[:start] + redaction + redacted_text[end:]
+        offset += len(redaction) - (end - start)
+
+print("Detected Entities with Scores:")
+for entity in entities2:
+    print(f"Entity: {entity['word']}, Label: {entity['entity_group']}, Score: {entity['score']:.4f}")
+
+print("\nRedacted Text:\n", redacted_text)
+
+
+
+# %% [markdown]
+# 
+
+# %%
+print("\nRedacted Text:\n", redacted_text)
+
+# %%
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+import re
+
+# Step 1: Define the Industry Finder URL
+INDUSTRY_FINDER_URL = "https://data.bls.gov/cew/apps/bls_naics/v3/bls_naics_app.htm"
+
+# Step 2: Scrape the Industry Finder page to find the latest year and CSV links
+response = requests.get(INDUSTRY_FINDER_URL)
+if response.status_code != 200:
+    print(f"Failed to access {INDUSTRY_FINDER_URL}. Status Code: {response.status_code}")
+    exit()
+
+# Parse the page content with BeautifulSoup
+soup = BeautifulSoup(response.content, 'html.parser')
+
+# Step 3: Extract all available years and links from the page
+csv_links = {}
+for link in soup.find_all('a', href=True):
+    text = link.get_text()
+    if "Titles and Descriptions" in text:
+        # Use regex to capture the year from the link text
+        match = re.search(r'(\d{4})', text)
+        if match:
+            year = int(match.group(1))
+            csv_links[year] = link['href']
+
+# Ensure we found some CSV links
+if not csv_links:
+    print("Could not find any 'Titles and Descriptions' CSV links.")
+    exit()
+
+# Step 4: Identify the latest year available
+latest_year = max(csv_links.keys())
+latest_csv_url = f"https://data.bls.gov{csv_links[latest_year]}"
+print(f"Found the latest CSV for {latest_year}: {latest_csv_url}")
+
+# Step 5: Download the latest CSV file
+csv_file = f"titles_and_descriptions_{latest_year}.csv"
+response = requests.get(latest_csv_url)
+if response.status_code == 200:
+    with open(csv_file, "wb") as f:
+        f.write(response.content)
+    print(f"CSV file saved as: {csv_file}")
+else:
+    print(f"Failed to download the CSV file. Status Code: {response.status_code}")
+    exit()
+
+#Load the CSV into a DataFrame for further processing
+naics_data = pd.read_csv(csv_file, on_bad_lines='skip')
+print("\nSample Data from NAICS Titles and Descriptions CSV:")
+print(naics_data.head())
+
+#trying to connect
+def recommend_naics_titles(resume_text, naics_df):
+    recommendations = []
+    # Adjust column names to match your CSV file structure
+    for line in resume_text.splitlines():
+        for title in naics_df['2022 NAICS Short Title']:
+            if title.lower() in line.lower():
+                recommendations.append(title)
+    return recommendations
+
+# Generate Recommendations
+try:
+    recommendations = recommend_naics_titles(resume_text, naics_data)
+    print("\nRecommended Job Titles from NAICS:")
+    for rec in recommendations:
+        print(f"- {rec}")
+except KeyError as e:
+    print(f"Error: {e}. Please check the column names in the CSV file.")
+
+#not generating results- why?
+
+# %%
+print(naics_data.columns)
+
+# %% [markdown]
+# # Next Steps : Untested- connecting NER pipeline to webscraping device and creating function for pdf text extracteor to upload resume due to error. Can pull and download csv file- not connecting to ner pipeline
+
+# %%
+#for future use for resume upload//idea function only, not tested
+
+Define Function to Extract Text from PDF Resume
+def extract_text_from_pdf(pdf_path):
+    text = ""
+    with pdfplumber.open(pdf_path) as pdf:
+        for page in pdf.pages:
+            text += page.extract_text()
+    return text
+
+# %%
+#from chatgpt- debug and finetune//not tested
+
+import pdfplumber
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+import re
+from sentence_transformers import SentenceTransformer, util
+from sklearn.metrics.pairwise import cosine_similarity
+from transformers import pipeline
+
+# Load Sentence Transformer Model and NER Pipeline
+model = SentenceTransformer('all-MiniLM-L6-v2')
+ner_pipeline = pipeline(
+    "ner", 
+    model="dbmdz/bert-large-cased-finetuned-conll03-english", 
+    aggregation_strategy="simple"
+)
+
+def extract_text_from_pdf(pdf_path):
+    """Extract text from the uploaded PDF resume."""
+    text = ""
+    with pdfplumber.open(pdf_path) as pdf:
+        for page in pdf.pages:
+            text += page.extract_text()
+    return text
+
+def redact_pii(text):
+    """Redact PII (emails, phone numbers, years, and NER-detected entities)."""
+    email_pattern = r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}'
+    phone_pattern = r'\+?\d[\d\s-]{9,}\d'
+    year_pattern = r'\b(19|20)\d{2}\b'
+    
+    redacted_text = re.sub(email_pattern, '[EMAIL REDACTED]', text)
+    redacted_text = re.sub(phone_pattern, '[PHONE REDACTED]', redacted_text)
+    redacted_text = re.sub(year_pattern, '[YEAR REDACTED]', redacted_text)
+    
+    entities = ner_pipeline(redacted_text)
+    offset = 0
+    for entity in sorted(entities, key=lambda x: x['start']):
+        if entity['score'] > 0.80:
+            start, end = entity['start'] + offset, entity['end'] + offset
+            redaction = '[PERSON]' if entity['entity_group'] == 'PER' else '[ORG]'
+            redacted_text = redacted_text[:start] + redaction + redacted_text[end:]
+            offset += len(redaction) - (end - start)
+    
+    return redacted_text, entities
+
+def scrape_naics_data():
+    """Scrape the latest NAICS Titles and Descriptions CSV."""
+    INDUSTRY_FINDER_URL = "https://data.bls.gov/cew/apps/bls_naics/v3/bls_naics_app.htm"
+    response = requests.get(INDUSTRY_FINDER_URL)
+    soup = BeautifulSoup(response.content, 'html.parser')
+
+    csv_links = {}
+    for link in soup.find_all('a', href=True):
+        text = link.get_text()
+        if "Titles and Descriptions" in text:
+            match = re.search(r'(\d{4})', text)
+            if match:
+                year = int(match.group(1))
+                csv_links[year] = link['href']
+
+    latest_year = max(csv_links.keys())
+    latest_csv_url = f"https://data.bls.gov{csv_links[latest_year]}"
+    csv_file = f"titles_and_descriptions_{latest_year}.csv"
+    response = requests.get(latest_csv_url)
+    with open(csv_file, "wb") as f:
+        f.write(response.content)
+    naics_data = pd.read_csv(csv_file, on_bad_lines='skip')
+    return naics_data
+
+def generate_recommendations(resume_sentences, naics_titles, naics_descriptions, threshold=0.5):
+    """Generate recommendations based on cosine similarity."""
+    resume_embeddings = model.encode(resume_sentences, convert_to_tensor=True)
+    naics_embeddings = model.encode(naics_titles + naics_descriptions, convert_to_tensor=True)
+
+    similarity_matrix = util.pytorch_cos_sim(resume_embeddings, naics_embeddings)
+    recommendations = []
+
+    for idx, sentence in enumerate(resume_sentences):
+        print(f"\nResume Sentence: {sentence}")
+        top_scores, top_indices = similarity_matrix[idx].topk(3)  # Top 3 matches
+
+        # Only keep matches above the similarity threshold
+        matched_titles = [
+            naics_titles[i % len(naics_titles)]
+            for i, score in zip(top_indices, top_scores) if score >= threshold
+        ]
+        recommendations.append((sentence, matched_titles))
+
+        # Debug: Print similarity scores
+        print(f"Top Scores: {top_scores}")
+
+    return recommendations
+
+# Upload PDF and Process Resume
+pdf_path = "your_resume.pdf"  # Replace with your PDF path
+resume_text = extract_text_from_pdf(pdf_path)
+redacted_text, entities = redact_pii(resume_text)
+print("\nRedacted Resume Text:\n", redacted_text)
+
+# Extract Sentences and Load NAICS Data
+resume_sentences = [line.strip() for line in redacted_text.split('\n') if line.strip()]
+naics_data = scrape_naics_data()
+naics_titles = naics_data['2022 NAICS Short Title'].tolist()
+naics_descriptions = naics_data['2022 NAICS Description'].tolist()
+
+# Generate and Display Recommendations
+recommendations = generate_recommendations(resume_sentences, naics_titles, naics_descriptions)
+print("\nRecommended Job Titles from NAICS:")
+for sentence, matches in recommendations:
+    for match in matches:
+        print(f"- {match}")
+
+
+
