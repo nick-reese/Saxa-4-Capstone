@@ -16,12 +16,6 @@ from dotenv import load_dotenv
 import openai
 from openai import OpenAI
 from sklearn.metrics.pairwise import cosine_similarity 
-import spacy.cli
-try:
-    nlp = spacy.load("en_core_web_lg")
-except OSError:
-    spacy.cli.download("en_core_web_lg")
-    nlp = spacy.load("en_core_web_lg")
 import spacy
 nlp = spacy.load("en_core_web_lg")
 from transformers import AutoTokenizer, AutoModelForTokenClassification, pipeline
