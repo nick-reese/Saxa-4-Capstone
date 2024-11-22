@@ -21,6 +21,16 @@ nlp = spacy.load("en_core_web_lg")
 from transformers import AutoTokenizer, AutoModelForTokenClassification, pipeline
 import re
 
+import subprocess
+
+# Install spacy and model
+subprocess.run(["pip", "install", "spacy"])
+subprocess.run(["python", "-m", "spacy", "download", "en_core_web_lg"])
+
+# Verify installation
+import spacy
+nlp = spacy.load("en_core_web_lg")
+
 #####################################################################
 
 st.image('georgetown_image.jpeg',
