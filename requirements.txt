@@ -1,4 +1,4 @@
-spacy==3.7.6
+spacy==3.8.0
 streamlit
 pandas
 numpy
@@ -8,3 +8,5 @@ python-docx
 scikit-learn
 python-dotenv
 openai
+transformers
+torch
