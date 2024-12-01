@@ -46,7 +46,32 @@ else:
 
 # import spacy_streamlit
 # models = ["en_core_web_sm", "en_core_web_md"]
-nlp = spacy.load("en_core_web_lg")
+
+
+def ensure_spacy_model_installed(model_name):
+    try:
+        # Check if the model is already installed
+        spacy.load(model_name)
+        print(f"The model '{model_name}' is already installed.")
+    except OSError:
+        print(f"The model '{model_name}' is not installed. Installing now...")
+        try:
+            # Install the model using subprocess
+            subprocess.check_call([sys.executable, "-m", "spacy", "download", model_name])
+            print(f"The model '{model_name}' has been installed successfully.")
+        except subprocess.CalledProcessError as e:
+            print(f"An error occurred while installing the model '{model_name}': {e}")
+            sys.exit(1)
+
+# Specify the model name
+model_name = "en_core_web_lg"
+
+# Ensure the model is installed and then load it
+ensure_spacy_model_installed(model_name)
+nlp = spacy.load(model_name)
+
+
+# nlp = spacy.load("en_core_web_lg")
 from transformers import AutoTokenizer, AutoModelForTokenClassification, pipeline
 import re
 
