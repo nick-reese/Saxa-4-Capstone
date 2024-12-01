@@ -7,11 +7,5 @@ nltk
 scikit-learn
 python-dotenv
 openai
-<<<<<<< HEAD
 spacy==3.7.6
 transformers
-=======
-spacy
-https://github.com/explosion/spacy-models/releases/download/en_core_web_lg-3.6.0/en_core_web_lg-3.6.0.tar.gz
-transformers
->>>>>>> parent of 5dbe81b (Updated the code again)
