@@ -198,7 +198,10 @@ client = OpenAI(api_key=api_key)
 #######################################################################
 # Adding Stopwords and Vectorizing 
 
-sw = stopwords.words("english")
+try:
+    sw = stopwords.words("english")
+except LookupError:
+    nltk.download("stopwords")
 sw.extend(['[Redacted]'])
 
 vec = TfidfVectorizer(stop_words = sw)
