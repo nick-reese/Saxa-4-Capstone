@@ -1,12 +1,10 @@
+spacy==3.7.6
+streamlit
 pandas
 numpy
-streamlit
-python-docx
-pdfplumber
 nltk
+pdfplumber
+python-docx
 scikit-learn
 python-dotenv
 openai
-spacy==3.7.6
-transformers
-spacy-streamlit
