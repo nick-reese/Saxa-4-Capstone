@@ -9,3 +9,4 @@ python-dotenv
 openai
 spacy==3.7.6
 transformers
+spacy_streamlit
