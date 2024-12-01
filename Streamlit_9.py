@@ -191,7 +191,7 @@ st.write("""
 st.markdown('---')
 load_dotenv()
 api_key = os.getenv("OPENAI_API_KEY")
-print(api_key)
+# print(api_key)
 client = OpenAI(api_key=api_key)
 
 #######################################################################
