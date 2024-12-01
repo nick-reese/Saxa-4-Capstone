@@ -19,8 +19,6 @@ from sklearn.metrics.pairwise import cosine_similarity
 import spacy
 import subprocess
 import sys
-import spacy
-from spacy.cli import download
 
 def check_package_installed(package_name):
     """Check if the package is installed by searching in the installed packages list."""
@@ -36,32 +34,15 @@ def check_spacy_in_requirements():
         requirements = f.read().splitlines()
         return any('spacy' in req for req in requirements)
 
-def check_model_installed(model_name):
-    """Check if the specific spaCy model is installed."""
-    try:
-        spacy.load(model_name)
-        return True
-    except OSError:
-        return False
-
 if check_spacy_in_requirements():
     if check_package_installed('spacy'):
-        # Check if the model is installed
-        if check_model_installed("en_core_web_lg"):
-            # Load the model if it's installed
-            nlp = spacy.load("en_core_web_lg")
-            print("Spacy model 'en_core_web_lg' loaded successfully!")
-        else:
-            print("Error: SpaCy model 'en_core_web_lg' is not installed. Downloading...")
-            download("en_core_web_lg")
-            print("Model 'en_core_web_lg' has been downloaded and installed.")
-            nlp = spacy.load("en_core_web_lg")
-            print("Spacy model 'en_core_web_lg' loaded successfully!")
+        # Import spacy if it's installed
+        import spacy
+        print("Spacy is successfully imported!")
     else:
         print("Error: Spacy is listed in requirements.txt but is not installed.")
 else:
     print("Error: Spacy is not listed in requirements.txt.")
-
 
 # import spacy_streamlit
 # models = ["en_core_web_sm", "en_core_web_md"]
