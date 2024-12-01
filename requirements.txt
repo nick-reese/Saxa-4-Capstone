@@ -1,5 +1,3 @@
-subprocess
-sys
 spacy==3.7.6
 streamlit
 pandas
