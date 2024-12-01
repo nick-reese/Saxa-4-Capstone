@@ -19,6 +19,27 @@ from sklearn.metrics.pairwise import cosine_similarity
 import spacy
 import subprocess
 import sys
+import pkg_resources
+
+# Function to check if a package is installed
+def check_and_install_package(package_name):
+    try:
+        # Check if the package is available
+        pkg_resources.get_distribution(package_name)
+        print(f"{package_name} is already installed.")
+    except pkg_resources.DistributionNotFound:
+        # If not installed, install the package
+        print(f"{package_name} is not installed. Installing now...")
+        subprocess.check_call(["pip", "install", package_name])
+
+# Check and install nltk
+check_and_install_package("nltk")
+
+# Import nltk after ensuring it is installed
+import nltk
+
+# Example usage of nltk
+print("nltk library has been successfully imported!")
 
 def check_package_installed(package_name):
     """Check if the package is installed by searching in the installed packages list."""
