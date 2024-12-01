@@ -19,11 +19,31 @@ from sklearn.metrics.pairwise import cosine_similarity
 import spacy
 import subprocess
 import sys
-try:
-    import spacy
-except ImportError:
-    subprocess.run([sys.executable, "-m", "pip", "install", "spacy==3.7.6"])
-    import spacy
+
+def check_package_installed(package_name):
+    """Check if the package is installed by searching in the installed packages list."""
+    try:
+        subprocess.check_call([sys.executable, "-m", "pip", "show", package_name])
+        return True
+    except subprocess.CalledProcessError:
+        return False
+
+def check_spacy_in_requirements():
+    """Check if spacy is listed in the requirements.txt file."""
+    with open('requirements.txt', 'r') as f:
+        requirements = f.read().splitlines()
+        return any('spacy' in req for req in requirements)
+
+if check_spacy_in_requirements():
+    if check_package_installed('spacy'):
+        # Import spacy if it's installed
+        import spacy
+        print("Spacy is successfully imported!")
+    else:
+        print("Error: Spacy is listed in requirements.txt but is not installed.")
+else:
+    print("Error: Spacy is not listed in requirements.txt.")
+
 # import spacy_streamlit
 # models = ["en_core_web_sm", "en_core_web_md"]
 nlp = spacy.load("en_core_web_lg")
