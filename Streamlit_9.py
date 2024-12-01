@@ -56,7 +56,8 @@ def ensure_package(package_name):
 # Ensure nltk is installed and import it
 ensure_package("nltk")
 import nltk
-print("nltk library has been successfully imported!")
+from nltk.corpus import stopwords
+print("nltk library and its components have been successfully imported!")
 
 # Ensure spacy is installed and import it
 ensure_package("spacy")
@@ -65,6 +66,7 @@ try:
     print("Spacy library has been successfully imported!")
 except ImportError:
     print("Error: Failed to import spacy.")
+
 
 
 nlp = spacy.load("en_core_web_lg")
