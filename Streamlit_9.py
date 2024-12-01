@@ -17,6 +17,13 @@ import openai
 from openai import OpenAI
 from sklearn.metrics.pairwise import cosine_similarity 
 import spacy
+import subprocess
+import sys
+try:
+    import spacy
+except ImportError:
+    subprocess.run([sys.executable, "-m", "pip", "install", "spacy==3.7.6"])
+    import spacy
 # import spacy_streamlit
 # models = ["en_core_web_sm", "en_core_web_md"]
 nlp = spacy.load("en_core_web_lg")
