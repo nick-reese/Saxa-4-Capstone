@@ -130,32 +130,37 @@ uploaded_file = st.file_uploader('Drag & and Drop your resume. We can analyze wo
                                  type = ['docx', 'txt', 'pdf', 'csv'])
 
 
-# Word
-if uploaded_file is not None:
-    resume_df = None
-    def read_docx(file):
-        doc = Document(file)
-        data = [para.text for para in doc.paragraphs]
-        return pd.DataFrame(data, columns = ['Redacted Text'])
-# Text
-    def read_txt(file):
-        data = file.read().decode("utf-8").splitlines()
-        return pd.DataFrame(data, columns = ['Redacted Text'])
-# Pdf
-    def read_pdf(file):
-        with pdfplumber.open(file) as pdf:
-            data = []
-            for page in pdf.pages:
-                text = page.extract_text()
-                if text:
-                    data.extend(text.splitlines())
-                return pd.DataFrame(data,  columns= ['Redacted Text'])
-# CSV
+# Initialize an empty DataFrame
+resume_df = pd.DataFrame()
 
-    def read_csv(file):
-        df = pd.read_csv(file)
-        return df
-    
+# Function definitions for reading different file types
+
+def read_docx(file):
+    doc = Document(file)
+    data = [para.text for para in doc.paragraphs]
+    return pd.DataFrame(data, columns=['Redacted Text'])
+
+def read_txt(file):
+    data = file.read().decode("utf-8").splitlines()
+    return pd.DataFrame(data, columns=['Redacted Text'])
+
+def read_pdf(file):
+    with pdfplumber.open(file) as pdf:
+        data = []
+        for page in pdf.pages:
+            text = page.extract_text()
+            if text:
+                data.extend(text.splitlines())
+        return pd.DataFrame(data, columns=['Redacted Text'])
+
+def read_csv(file):
+    df = pd.read_csv(file)
+    return df
+
+# File upload logic
+uploaded_file = st.file_uploader('Drag & Drop your resume. We can analyze word, pdf, txt or csv', type=['docx', 'txt', 'pdf', 'csv'])
+
+if uploaded_file is not None:
     if uploaded_file.name.endswith('.docx'):
         resume_df = read_docx(uploaded_file)
     elif uploaded_file.name.endswith('.txt'):
@@ -167,9 +172,12 @@ if uploaded_file is not None:
     else:
         st.error("Unsupported file type!")
 
-
-st.markdown('### Non Processed Resume')
-st.dataframe(resume_df)
+# Display the resume dataframe if it was successfully loaded
+if not resume_df.empty:
+    st.markdown('### Non Processed Resume')
+    st.dataframe(resume_df)
+else:
+    st.info("Please upload a valid resume file.")
 
 #######################################################################
 
