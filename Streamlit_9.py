@@ -55,7 +55,7 @@ st.markdown(
     <p class="main-caption">Saxa - 4</p>
     <p class="name-list">Nicholas Reese</p>
     <p class="name-list">Ashlyn Bellardine</p>
-    <p class="name-list">Osama Bin Habibi</p>
+    <p class="name-list">Osama Bin Habib</p>
     <p class="name-list">Dezmond Richardson</p>
     <p class="name-list">Genesis Roberto</p>
     
