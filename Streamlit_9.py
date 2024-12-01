@@ -24,8 +24,8 @@ import re
 
 #####################################################################
 
-st.image('georgetown_image.jpeg',
-         use_column_width= True)
+st.image('georgetown_image.jpeg', use_container_width=True)
+
 
 
 st.markdown(
