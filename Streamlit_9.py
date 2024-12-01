@@ -18,78 +18,53 @@ from openai import OpenAI
 from sklearn.metrics.pairwise import cosine_similarity 
 import spacy
 import subprocess
-import sys
 import pkg_resources
+import sys
 
-# Function to check if a package is installed
 def check_and_install_package(package_name):
+    """
+    Check if a package is installed, and if not, install it.
+    """
     try:
-        # Check if the package is available
         pkg_resources.get_distribution(package_name)
         print(f"{package_name} is already installed.")
     except pkg_resources.DistributionNotFound:
-        # If not installed, install the package
         print(f"{package_name} is not installed. Installing now...")
-        subprocess.check_call(["pip", "install", package_name])
+        subprocess.check_call([sys.executable, "-m", "pip", "install", package_name])
 
-# Check and install nltk
-check_and_install_package("nltk")
-
-# Import nltk after ensuring it is installed
-import nltk
-
-# Example usage of nltk
-print("nltk library has been successfully imported!")
-
-def check_package_installed(package_name):
-    """Check if the package is installed by searching in the installed packages list."""
+def check_package_in_requirements(package_name):
+    """
+    Check if a package is listed in requirements.txt.
+    """
     try:
-        subprocess.check_call([sys.executable, "-m", "pip", "show", package_name])
-        return True
-    except subprocess.CalledProcessError:
+        with open("requirements.txt", "r") as f:
+            requirements = f.read().splitlines()
+        return any(package_name in req for req in requirements)
+    except FileNotFoundError:
+        print("requirements.txt file not found.")
         return False
 
-def check_spacy_in_requirements():
-    """Check if spacy is listed in the requirements.txt file."""
-    with open('requirements.txt', 'r') as f:
-        requirements = f.read().splitlines()
-        return any('spacy' in req for req in requirements)
-
-if check_spacy_in_requirements():
-    if check_package_installed('spacy'):
-        # Import spacy if it's installed
-        import spacy
-        print("Spacy is successfully imported!")
+def ensure_package(package_name):
+    """
+    Ensure a package is installed if it's listed in requirements.txt.
+    """
+    if check_package_in_requirements(package_name):
+        check_and_install_package(package_name)
     else:
-        print("Error: Spacy is listed in requirements.txt but is not installed.")
-else:
-    print("Error: Spacy is not listed in requirements.txt.")
+        print(f"Error: {package_name} is not listed in requirements.txt.")
 
-# import spacy_streamlit
-# models = ["en_core_web_sm", "en_core_web_md"]
+# Ensure nltk is installed and import it
+ensure_package("nltk")
+import nltk
+print("nltk library has been successfully imported!")
 
-
-# def ensure_spacy_model_installed(model_name):
-#     try:
-#         # Check if the model is already installed
-#         spacy.load(model_name)
-#         print(f"The model '{model_name}' is already installed.")
-#     except OSError:
-#         print(f"The model '{model_name}' is not installed. Installing now...")
-#         try:
-#             # Install the model using subprocess
-#             subprocess.check_call([sys.executable, "-m", "spacy", "download", model_name])
-#             print(f"The model '{model_name}' has been installed successfully.")
-#         except subprocess.CalledProcessError as e:
-#             print(f"An error occurred while installing the model '{model_name}': {e}")
-#             sys.exit(1)
-
-# # Specify the model name
-# model_name = "en_core_web_lg"
-
-# # Ensure the model is installed and then load it
-# ensure_spacy_model_installed(model_name)
-# nlp = spacy.load(model_name)
+# Ensure spacy is installed and import it
+ensure_package("spacy")
+try:
+    import spacy
+    print("Spacy library has been successfully imported!")
+except ImportError:
+    print("Error: Failed to import spacy.")
 
 
 nlp = spacy.load("en_core_web_lg")
@@ -218,11 +193,7 @@ client = OpenAI(api_key=api_key)
 
 #######################################################################
 # Adding Stopwords and Vectorizing 
-
-try:
-    sw = stopwords.words("english")
-except LookupError:
-    nltk.download("stopwords")
+sw = stopwords.words("english")
 sw.extend(['[Redacted]'])
 
 vec = TfidfVectorizer(stop_words = sw)
