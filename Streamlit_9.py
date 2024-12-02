@@ -70,7 +70,7 @@ except ImportError:
 
 
 nlp = spacy.load("en_core_web_lg")
-from transformers import AutoTokenizer, AutoModelForTokenClassification, pipeline
+# from transformers import AutoTokenizer, AutoModelForTokenClassification, pipeline
 import re
 
 

@@ -10,4 +10,3 @@ scikit-learn
 python-dotenv
 openai
 transformers
-torch
